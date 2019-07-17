@@ -147,7 +147,7 @@ class HudService private constructor() {
                 if (throwable is NeedRetryException) {
                     return@flatMap Observable.just(1).delay(retryInterval, TimeUnit.SECONDS)
                 } else {
-                    return@flatMap Observable.error(throwable)
+                    return@flatMap Observable.error<Any>(throwable)
                 }
 
             }
