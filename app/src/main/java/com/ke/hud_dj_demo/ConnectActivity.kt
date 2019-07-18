@@ -83,6 +83,9 @@ class ConnectActivity : AppCompatActivity() {
 
 
         initListener()
+
+        loopSendHeart()
+
     }
 
 
@@ -115,16 +118,7 @@ class ConnectActivity : AppCompatActivity() {
         disconnect.setOnClickListener { hudService.disconnect() }
 
         send_heart.setOnClickListener { view ->
-            heartLoopDisposable?.dispose()
-
-            heartLoopDisposable = Observable.interval(0, 5, TimeUnit.SECONDS)
-                .map { hudService.sendHeart() to it }
-                .doOnDispose {
-                    "取消发送心跳包".log()
-                }
-                .subscribe {
-                    "心跳包发送结果 ${it.first} ${it.second}".log()
-                }
+            loopSendHeart()
         }
 
         cancel_send_heart.setOnClickListener {
@@ -220,7 +214,8 @@ class ConnectActivity : AppCompatActivity() {
 
         send_camera_info_list.setOnClickListener {
 
-            val result = hudService.sendCameraInfoList(listOf(CameraInfo(1, 80, 200), CameraInfo(3, 90, 200)))
+            val result =
+                hudService.sendCameraInfoList(listOf(CameraInfo(1, 80, 200, 0.0, 0.0), CameraInfo(3, 90, 200, .0, .0)))
 
             loggerMessage("发送摄像机信息结果 $result")
         }
@@ -246,6 +241,19 @@ class ConnectActivity : AppCompatActivity() {
         refresh_state.setOnClickListener {
             refresh_state.text = "刷新状态 = ${hudService.connectState.name}"
         }
+    }
+
+    private fun loopSendHeart() {
+        heartLoopDisposable?.dispose()
+
+        heartLoopDisposable = Observable.interval(0, 5, TimeUnit.SECONDS)
+            .map { hudService.sendHeart() to it }
+            .doOnDispose {
+                "取消发送心跳包".log()
+            }
+            .subscribe {
+                "心跳包发送结果 ${it.first} ${it.second}".log()
+            }
     }
 
 

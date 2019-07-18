@@ -84,7 +84,7 @@ class HudService private constructor() {
     private fun onDeviceDisconnected() {
 
         if (autoReconnect && !isUserQuit) {
-//            startReconnect()
+            startReconnect()
         }
 
     }
@@ -113,7 +113,7 @@ class HudService private constructor() {
 
         reconnectDisposable = Observable.create<Boolean> { emitter ->
 
-            retryCount += retryCount
+            retryCount += 1
 
             messageHandler?.log("开始尝试第" + retryCount + "次重连")
 
@@ -121,13 +121,20 @@ class HudService private constructor() {
                 override fun onConnectSuccess(p0: String?) {
 
                     messageHandler?.log("第$retryCount 次重连成功 $p0")
+
+                    if (emitter.isDisposed) {
+                        return
+                    }
+
                     emitter.onNext(true)
                     emitter.onComplete()
                 }
 
                 override fun onConnectFailed(p0: String) {
                     messageHandler?.log("第$retryCount 次重连失败 $p0")
-
+                    if (emitter.isDisposed) {
+                        return
+                    }
 
                     if (retryCount <= maxRetryCount) {
                         emitter.onError(NeedRetryException())

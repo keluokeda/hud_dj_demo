@@ -126,7 +126,9 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
             CameraInfo(
                 type = it.cameraType,
                 speed = it.cameraSpeed,
-                distance = it.cameraDistance
+                distance = it.cameraDistance,
+                x = it.x,
+                y = it.y
             )
         })
     }
