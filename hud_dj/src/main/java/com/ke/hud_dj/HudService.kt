@@ -313,7 +313,6 @@ class HudService private constructor() {
     /**
      * 发送电话号码
      */
-    @Deprecated(message = "无效")
     fun sendPhoneWithName(phone: String, name: String?) = chatService.sender.sendPhoneWithName(1, phone, name)
 
 
