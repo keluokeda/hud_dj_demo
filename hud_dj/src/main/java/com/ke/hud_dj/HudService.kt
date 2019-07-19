@@ -87,6 +87,10 @@ class HudService private constructor() {
             startReconnect()
         }
 
+        if (isUserQuit) {
+            isUserQuit = false
+        }
+
     }
 
 
@@ -242,6 +246,7 @@ class HudService private constructor() {
      * 断开连接
      */
     fun disconnect() {
+        messageHandler?.log("用户点击断开连接")
         chatService.stop()
         connectStateSubject.onNext(DeviceConnectState.Disconnected)
 
@@ -250,11 +255,11 @@ class HudService private constructor() {
         reconnectDisposable?.dispose()
 
 
-        Observable.timer(2, TimeUnit.SECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                isUserQuit = false
-            }
+//        Observable.timer(5, TimeUnit.SECONDS)
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe {
+//                isUserQuit = false
+//            }
     }
 
 
