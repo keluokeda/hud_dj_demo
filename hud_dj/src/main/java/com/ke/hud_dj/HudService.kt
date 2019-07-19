@@ -344,6 +344,7 @@ class HudService private constructor() {
                         vision = p0.vision ?: "",
                         protocol = p0.protocol ?: "",
                         fileUrl = p0.fileUrl ?: ""
+
                     )
                 )
             }
