@@ -20,7 +20,6 @@ import com.ke.hud_dj.entity.toDeviceConnectState
 import com.ke.hud_dj.exception.NeedRetryException
 import com.ke.hud_dj.exception.RetryTimesOutExcrption
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -82,6 +81,8 @@ class HudService private constructor() {
 
 
     private fun onDeviceDisconnected() {
+
+//        chatService.sender.upDateOta()
 
         if (autoReconnect && !isUserQuit) {
             startReconnect()
@@ -346,7 +347,7 @@ class HudService private constructor() {
                     HudInfo(
                         hardware = p0.hardware ?: "",
                         mode = p0.mode ?: "",
-                        vision = p0.vision ?: "",
+                        version = p0.vision ?: "",
                         protocol = p0.protocol ?: "",
                         fileUrl = p0.fileUrl ?: ""
 
