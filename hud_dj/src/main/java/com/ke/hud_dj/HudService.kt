@@ -31,6 +31,11 @@ import java.util.concurrent.TimeUnit
 class HudService private constructor() {
     val connectStateSubject: Subject<DeviceConnectState> = BehaviorSubject.create()
 
+    /**
+     * 重新连接事件
+     */
+    val onReconnectEventSubject = BehaviorSubject.create<Boolean>()
+
 
     private var reconnectDisposable: Disposable? = null
 
@@ -99,6 +104,8 @@ class HudService private constructor() {
     /**
      * 升级软件
      */
+
+    @Deprecated(message = "容易卡死")
     fun otaUpdate(file: File): Observable<Boolean> {
         return Observable.just(chatService.sender.upDateOta(file.readBytes())).subscribeOn(Schedulers.io())
     }
@@ -107,6 +114,8 @@ class HudService private constructor() {
      * 开始重新连接
      */
     private fun startReconnect() {
+
+        onReconnectEventSubject.onNext(true)
 
         messageHandler?.log("准备重新连接")
 
