@@ -326,7 +326,6 @@ class HudService private constructor() {
     /**
      * 获取hud信息
      */
-    @Deprecated(message = "一直回调错误信息")
     fun getHudInfo(): Observable<HudInfo> = Observable.create { emitter ->
         chatService.geter.getHUDInfo(object : OnAbsGetDataListener() {
             override fun onGetFirmwareInfo(p0: FirmwareInfo) {
@@ -349,29 +348,18 @@ class HudService private constructor() {
                 )
             }
 
-            override fun dataError(p0: String?) {
-                super.dataError(p0)
+            override fun onGetFirmwareInfoFailed() {
+                super.onGetFirmwareInfoFailed()
 
-                messageHandler?.log("发生错误 $p0")
-
-                if (emitter.isDisposed) {
-                    return
-                }
-
-                emitter.onError(RuntimeException(p0))
-            }
-
-            override fun unKnowData(p0: String?) {
-                super.unKnowData(p0)
-                messageHandler?.log("发生错误 $p0")
+                messageHandler?.log("获取版本信息失败")
 
                 if (emitter.isDisposed) {
                     return
                 }
 
-                emitter.onError(RuntimeException(p0))
-
+                emitter.onError(RuntimeException("获取版本信息失败"))
             }
+
 
         })
     }
