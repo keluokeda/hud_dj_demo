@@ -24,6 +24,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 
@@ -94,6 +95,13 @@ class HudService private constructor() {
 
     }
 
+
+    /**
+     * 升级软件
+     */
+    fun otaUpdate(file: File): Observable<Boolean> {
+        return Observable.just(chatService.sender.upDateOta(file.readBytes())).subscribeOn(Schedulers.io())
+    }
 
     /**
      * 开始重新连接
