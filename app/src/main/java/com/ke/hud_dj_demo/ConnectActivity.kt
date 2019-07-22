@@ -17,6 +17,7 @@ import com.amap.api.navi.AmapNaviParams
 import com.ke.hud_dj.HudService
 import com.ke.hud_dj.entity.CameraInfo
 import com.ke.hud_dj.entity.DeviceConnectState
+import com.ke.hud_dj.entity.NavigationInfo
 import com.orhanobut.logger.Logger
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -128,7 +129,7 @@ class ConnectActivity : AppCompatActivity() {
         send_navigation.setOnClickListener {
 
 
-            hudService.sendNavigationInformationWithDirection(3, 100, "当前道路", "下一个道路", 100, 1000, 60)
+            hudService.sendNavigationInformationWithDirection(NavigationInfo(3, 100, "当前道路", "下一个道路", 100, 1000, 60))
                 .subscribe {
                     "发送导航信息结果 $it".log()
                 }
@@ -137,7 +138,7 @@ class ConnectActivity : AppCompatActivity() {
 
         send_image.setOnClickListener {
 
-            hudService.sendNavigationInformationWithDirection(3, 100, "当前道路", "下一个道路", 100, 1000, 60)
+            hudService.sendNavigationInformationWithDirection(NavigationInfo(3, 100, "当前道路", "下一个道路", 100, 1000, 60))
 
                 .flatMap {
 
@@ -180,13 +181,14 @@ class ConnectActivity : AppCompatActivity() {
                     start++
 
                     hudService.sendNavigationInformationWithDirection(
+                        NavigationInfo(
                         3,
                         start,
                         "当前道路",
                         "下一个道路",
                         100,
                         1000,
-                        60
+                        60)
                     ).map { result ->
                         return@map result to start
                     }

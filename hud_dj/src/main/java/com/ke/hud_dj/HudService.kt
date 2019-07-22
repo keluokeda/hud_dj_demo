@@ -13,10 +13,7 @@ import com.example.bletohud.bleDevice.CamerasInfo
 import com.example.bletohud.bleDevice.OnAbsConnectListener
 import com.example.bletohud.bleDevice.OnAbsGetDataListener
 import com.example.bletohud.bleDevice.recevie.FirmwareInfo
-import com.ke.hud_dj.entity.CameraInfo
-import com.ke.hud_dj.entity.DeviceConnectState
-import com.ke.hud_dj.entity.HudInfo
-import com.ke.hud_dj.entity.toDeviceConnectState
+import com.ke.hud_dj.entity.*
 import com.ke.hud_dj.exception.NeedRetryException
 import com.ke.hud_dj.exception.RetryTimesOutExcrption
 import io.reactivex.Observable
@@ -115,7 +112,7 @@ class HudService private constructor() {
      */
     private fun startReconnect() {
 
-        onReconnectEventSubject.onNext(true)
+        onReconnectEventSubject.onNext(false)
 
         messageHandler?.log("准备重新连接")
 
@@ -186,6 +183,8 @@ class HudService private constructor() {
             }
             .subscribe({
                 messageHandler?.log("hud重连结果 $it")
+
+
             }, {
                 messageHandler?.log("hud重连失败")
                 messageHandler?.error(it)
@@ -292,13 +291,7 @@ class HudService private constructor() {
      */
     @CheckResult
     fun sendNavigationInformationWithDirection(
-        iconType: Int,
-        currentStepRetainDistance: Int,
-        currentRoadName: String,
-        nextRoadName: String,
-        pathRetainTime: Int,
-        pathRetainDistance: Int,
-        currentSpeed: Int
+        navigationInfo: NavigationInfo
     ): Observable<Boolean> {
 
 //        chatService.state
@@ -307,13 +300,13 @@ class HudService private constructor() {
             .observeOn(Schedulers.io())
             .map {
                 chatService.sender.sendNavigationInformationWithDirection(
-                    if (currentStepRetainDistance >= 2000) 9 else iconType,
-                    currentStepRetainDistance,
-                    currentRoadName,
-                    nextRoadName,
-                    pathRetainTime,
-                    pathRetainDistance,
-                    currentSpeed
+                    if (navigationInfo.currentStepRetainDistance >= 2000) 9 else navigationInfo.iconType,
+                    navigationInfo.currentStepRetainDistance,
+                    navigationInfo.currentRoadName,
+                    navigationInfo.nextRoadName,
+                    navigationInfo.pathRetainTime,
+                    navigationInfo.pathRetainDistance,
+                    navigationInfo.currentSpeed
                 )
             }
     }
