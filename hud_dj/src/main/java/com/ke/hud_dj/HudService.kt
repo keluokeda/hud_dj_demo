@@ -340,6 +340,13 @@ class HudService private constructor() {
 
 
     /**
+     * 发送道路图片
+     */
+    fun sendRoadImage(bitmap: Bitmap): Boolean {
+        return chatService.sender.sendRoadImageWithPositionX(0, 0, bitmap)
+    }
+
+    /**
      * 获取hud信息
      */
     fun getHudInfo(): Observable<HudInfo> = Observable.create { emitter ->
