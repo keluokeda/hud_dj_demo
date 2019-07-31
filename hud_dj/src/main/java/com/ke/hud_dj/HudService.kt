@@ -343,9 +343,9 @@ class HudService private constructor() {
     /**
      * 发送道路图片
      */
-    fun sendRoadImage(bitmap: Bitmap): Boolean {
+    fun sendRoadImage(bitmap: Bitmap, height: Int = 20): Boolean {
 
-        val newBitmap = scaleBitmap(bitmap)
+        val newBitmap = scaleBitmap(bitmap, height)
 
         messageHandler?.log("新的图片的宽度 = ${newBitmap.width} ， 高度 = ${newBitmap.height}")
 
@@ -354,11 +354,10 @@ class HudService private constructor() {
     }
 
 
-    private fun scaleBitmap(bitmap: Bitmap): Bitmap {
+    private fun scaleBitmap(bitmap: Bitmap, height: Int): Bitmap {
 
-        val newHeight = 20
 
-        val scale = newHeight * 1.0f / bitmap.height
+        val scale = height * 1.0f / bitmap.height
         val matrix = Matrix()
         matrix.postScale(scale, scale)
 
