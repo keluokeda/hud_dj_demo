@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.support.annotation.CheckResult
 import com.example.bletohud.DJBTManager
 import com.example.bletohud.bleDevice.CamerasInfo
@@ -343,8 +344,27 @@ class HudService private constructor() {
      * 发送道路图片
      */
     fun sendRoadImage(bitmap: Bitmap): Boolean {
-        return chatService.sender.sendRoadImageWithPositionX(0, 0, bitmap)
+
+        val newBitmap = scaleBitmap(bitmap)
+
+        messageHandler?.log("新的图片的宽度 = ${newBitmap.width} ， 高度 = ${newBitmap.height}")
+
+
+        return chatService.sender.sendRoadImageWithPositionX(0, 0, newBitmap)
     }
+
+
+    private fun scaleBitmap(bitmap: Bitmap): Bitmap {
+
+        val newHeight = 20
+
+        val scale = newHeight * 1.0f / bitmap.height
+        val matrix = Matrix()
+        matrix.postScale(scale, scale)
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
+    }
+
 
     /**
      * 取消道路图片显示
