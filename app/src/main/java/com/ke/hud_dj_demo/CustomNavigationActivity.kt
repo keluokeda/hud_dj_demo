@@ -8,6 +8,7 @@ import com.amap.api.navi.model.*
 import com.autonavi.tbt.TrafficFacilityInfo
 import com.ke.hud_dj.HudService
 import com.ke.hud_dj.entity.CameraInfo
+import com.ke.hud_dj.entity.NavigationInfo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -24,13 +25,15 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
 
 
         hudService.sendNavigationInformationWithDirection(
-            info.iconType,
-            info.curStepRetainDistance,
-            info.currentRoadName,
-            info.nextRoadName,
-            info.pathRetainTime,
-            info.pathRetainDistance,
-            info.currentSpeed
+            NavigationInfo(
+                info.iconType,
+                info.curStepRetainDistance,
+                info.currentRoadName,
+                info.nextRoadName,
+                info.pathRetainTime,
+                info.pathRetainDistance,
+                info.currentSpeed
+            )
         ).observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 loggerMessage("导航信息发送结果 $it")

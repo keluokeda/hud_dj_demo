@@ -323,7 +323,7 @@ class HudService private constructor() {
      * 取消图片
      */
     @CheckResult
-    fun clearImage() = Observable.just(chatService.sender.clearImg()).subscribeOn(Schedulers.io())
+    fun clearImage(): Observable<Boolean> = Observable.just(chatService.sender.clearImg()).subscribeOn(Schedulers.io())
 
 
     /**
@@ -345,6 +345,11 @@ class HudService private constructor() {
     fun sendRoadImage(bitmap: Bitmap): Boolean {
         return chatService.sender.sendRoadImageWithPositionX(0, 0, bitmap)
     }
+
+    /**
+     * 取消道路图片显示
+     */
+    fun clearRoadImage() = chatService.sender.sendCancleRoadImageWithPositionX()
 
     /**
      * 获取hud信息
