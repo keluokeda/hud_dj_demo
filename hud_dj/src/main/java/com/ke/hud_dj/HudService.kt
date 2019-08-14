@@ -14,6 +14,7 @@ import com.example.bletohud.bleDevice.CamerasInfo
 import com.example.bletohud.bleDevice.OnAbsConnectListener
 import com.example.bletohud.bleDevice.OnAbsGetDataListener
 import com.example.bletohud.bleDevice.recevie.FirmwareInfo
+
 import com.ke.hud_dj.entity.*
 import com.ke.hud_dj.exception.NeedRetryException
 import com.ke.hud_dj.exception.RetryTimesOutExcrption
@@ -105,7 +106,9 @@ class HudService private constructor() {
 
     @Deprecated(message = "容易卡死")
     fun otaUpdate(file: File): Observable<Boolean> {
-        return Observable.just(chatService.sender.upDateOta(file.readBytes())).subscribeOn(Schedulers.io())
+//        return Observable.just(chatService.sender.upDateOta(file.readBytes())).subscribeOn(Schedulers.io())
+
+        return Observable.just(false)
     }
 
     /**
