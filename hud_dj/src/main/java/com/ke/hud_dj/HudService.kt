@@ -298,6 +298,8 @@ class HudService private constructor() {
         navigationInfo: NavigationInfo
     ): Observable<Boolean> {
 
+
+
 //        chatService.state
 
         return Observable.just(1)

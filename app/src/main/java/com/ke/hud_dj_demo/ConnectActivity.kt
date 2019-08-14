@@ -130,9 +130,11 @@ class ConnectActivity : AppCompatActivity() {
 
 
             hudService.sendNavigationInformationWithDirection(NavigationInfo(3, 100, "当前道路", "下一个道路", 100, 1000, 60))
-                .subscribe {
+                .subscribe({
                     "发送导航信息结果 $it".log()
-                }
+                }, {
+                    it.printStackTrace()
+                })
                 .addTo(compositeDisposable)
         }
 
@@ -182,13 +184,14 @@ class ConnectActivity : AppCompatActivity() {
 
                     hudService.sendNavigationInformationWithDirection(
                         NavigationInfo(
-                        3,
-                        start,
-                        "当前道路",
-                        "下一个道路",
-                        100,
-                        1000,
-                        60)
+                            3,
+                            start,
+                            "当前道路",
+                            "下一个道路",
+                            100,
+                            1000,
+                            60
+                        )
                     ).map { result ->
                         return@map result to start
                     }
