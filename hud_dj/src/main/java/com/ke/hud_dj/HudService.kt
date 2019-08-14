@@ -299,7 +299,6 @@ class HudService private constructor() {
     ): Observable<Boolean> {
 
 
-
 //        chatService.state
 
         return Observable.just(1)
@@ -315,6 +314,15 @@ class HudService private constructor() {
                     navigationInfo.currentSpeed
                 )
             }
+    }
+
+    fun onNavigationDestroy() {
+        chatService.sender.sendNavigationInformationWithDirection(
+            255,
+            0,
+            "",
+            "", 0, 0, 0
+        )
     }
 
     /**
@@ -355,7 +363,7 @@ class HudService private constructor() {
         messageHandler?.log("新的图片的宽度 = ${newBitmap.width} ， 高度 = ${newBitmap.height}")
 
 
-        return chatService.sender.sendRoadImageWithPositionX(0, 0, newBitmap)
+        return chatService.sender.sendRoadImageWithPositionX(0, 0, newBitmap, true)
     }
 
 
