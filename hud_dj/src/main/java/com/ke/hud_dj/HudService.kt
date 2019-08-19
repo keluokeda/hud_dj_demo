@@ -1,6 +1,7 @@
 package com.ke.hud_dj
 
 import android.app.Activity
+import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
@@ -107,12 +108,12 @@ class HudService private constructor() {
      */
 
 //    @Deprecated(message = "容易卡死")
-    fun otaUpdate(file: File): Observable<Int> {
+    fun otaUpdate(file: File, application: Application): Observable<Int> {
 //        return Observable.just(chatService.sender.upDateOta(file.readBytes())).subscribeOn(Schedulers.io())
 
         return Observable.create { emitter ->
 
-            Update.getInstance(null).UpdateOtaDataByLocal(file.absolutePath, object : OnAbsGetDataListener() {
+            Update.getInstance(application).UpdateOtaDataByLocal(file.absolutePath, object : OnAbsGetDataListener() {
 
                 override fun onProgress(p0: Double) {
 
