@@ -1,5 +1,6 @@
 package com.ke.hud_dj
 
+import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
@@ -13,6 +14,7 @@ import com.example.bletohud.DJBTManager
 import com.example.bletohud.bleDevice.CamerasInfo
 import com.example.bletohud.bleDevice.OnAbsConnectListener
 import com.example.bletohud.bleDevice.OnAbsGetDataListener
+import com.example.bletohud.bleDevice.Update
 import com.example.bletohud.bleDevice.recevie.FirmwareInfo
 
 import com.ke.hud_dj.entity.*
@@ -104,11 +106,32 @@ class HudService private constructor() {
      * 升级软件
      */
 
-    @Deprecated(message = "容易卡死")
-    fun otaUpdate(file: File): Observable<Boolean> {
+//    @Deprecated(message = "容易卡死")
+    fun otaUpdate(file: File, activity: Activity): Observable<Int> {
 //        return Observable.just(chatService.sender.upDateOta(file.readBytes())).subscribeOn(Schedulers.io())
 
-        return Observable.just(false)
+        return Observable.create { emitter ->
+
+            Update.getInstance(activity).UpdateOtaDataByLocal(file.absolutePath, object : OnAbsGetDataListener() {
+
+                override fun onProgress(p0: Double) {
+
+                    val progress = (p0 * 100).toInt()
+
+                    messageHandler?.log("更新进度变更 $p0 $progress")
+
+                    emitter.onNext(progress)
+
+                    if (progress == 100) {
+                        emitter.onComplete()
+                    }
+
+                }
+            })
+        }
+
+
+//        return Observable.just(false)
     }
 
     /**
