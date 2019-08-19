@@ -107,12 +107,12 @@ class HudService private constructor() {
      */
 
 //    @Deprecated(message = "容易卡死")
-    fun otaUpdate(file: File, activity: Activity): Observable<Int> {
+    fun otaUpdate(file: File): Observable<Int> {
 //        return Observable.just(chatService.sender.upDateOta(file.readBytes())).subscribeOn(Schedulers.io())
 
         return Observable.create { emitter ->
 
-            Update.getInstance(activity).UpdateOtaDataByLocal(file.absolutePath, object : OnAbsGetDataListener() {
+            Update.getInstance(null).UpdateOtaDataByLocal(file.absolutePath, object : OnAbsGetDataListener() {
 
                 override fun onProgress(p0: Double) {
 
