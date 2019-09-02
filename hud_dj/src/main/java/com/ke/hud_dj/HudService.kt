@@ -25,6 +25,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -33,13 +34,10 @@ import java.util.concurrent.TimeUnit
 class HudService private constructor() {
     val connectStateSubject: Subject<DeviceConnectState> = BehaviorSubject.create()
 
-    /**
-     * 重新连接事件
-     */
-    val onReconnectEventSubject = BehaviorSubject.create<Boolean>()
-
 
     private var reconnectDisposable: Disposable? = null
+
+    val reconnectResultSubject = PublishSubject.create<Boolean>()
 
 
     /**
@@ -113,22 +111,23 @@ class HudService private constructor() {
 
         return Observable.create { emitter ->
 
-            Update.getInstance(application).UpdateOtaDataByLocal(file.absolutePath, object : OnAbsGetDataListener() {
+            Update.getInstance(application)
+                .UpdateOtaDataByLocal(file.absolutePath, object : OnAbsGetDataListener() {
 
-                override fun onProgress(p0: Double) {
+                    override fun onProgress(p0: Double) {
 
-                    val progress = (p0 * 100).toInt()
+                        val progress = (p0 * 100).toInt()
 
-                    messageHandler?.log("更新进度变更 $p0 $progress")
+                        messageHandler?.log("更新进度变更 $p0 $progress")
 
-                    emitter.onNext(progress)
+                        emitter.onNext(progress)
 
-                    if (progress == 100) {
-                        emitter.onComplete()
+                        if (progress == 100) {
+                            emitter.onComplete()
+                        }
+
                     }
-
-                }
-            })
+                })
         }
 
 
@@ -140,7 +139,6 @@ class HudService private constructor() {
      */
     private fun startReconnect() {
 
-        onReconnectEventSubject.onNext(false)
 
         messageHandler?.log("准备重新连接")
 
@@ -211,6 +209,8 @@ class HudService private constructor() {
             }
             .subscribe({
                 messageHandler?.log("hud重连结果 $it")
+
+                reconnectResultSubject.onNext(it)
 
 
             }, {
@@ -361,13 +361,15 @@ class HudService private constructor() {
      * 取消图片
      */
     @CheckResult
-    fun clearImage(): Observable<Boolean> = Observable.just(chatService.sender.clearImg()).subscribeOn(Schedulers.io())
+    fun clearImage(): Observable<Boolean> =
+        Observable.just(chatService.sender.clearImg()).subscribeOn(Schedulers.io())
 
 
     /**
      * 发送电话号码
      */
-    fun sendPhoneWithName(phone: String, name: String?) = chatService.sender.sendPhoneWithName(1, phone, name)
+    fun sendPhoneWithName(phone: String, name: String?) =
+        chatService.sender.sendPhoneWithName(1, phone, name)
 
 
     /**
