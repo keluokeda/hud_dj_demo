@@ -12,9 +12,10 @@ import android.graphics.Matrix
 import android.support.annotation.CheckResult
 import com.example.bletohud.DJBTManager
 import com.example.bletohud.bleDevice.CamerasInfo
-import com.example.bletohud.bleDevice.OnAbsConnectListener
-import com.example.bletohud.bleDevice.OnAbsGetDataListener
+
 import com.example.bletohud.bleDevice.Update
+import com.example.bletohud.bleDevice.listener.OnAbsConnectListener
+import com.example.bletohud.bleDevice.listener.OnAbsGetDataListener
 import com.example.bletohud.bleDevice.recevie.FirmwareInfo
 import com.ke.hud_dj.entity.*
 import com.ke.hud_dj.exception.NeedRetryException
@@ -112,9 +113,7 @@ class HudService private constructor() {
      * 升级软件
      */
 
-//    @Deprecated(message = "容易卡死")
     fun otaUpdate(file: File, application: Application): Observable<Int> {
-//        return Observable.just(chatService.sender.upDateOta(file.readBytes())).subscribeOn(Schedulers.io())
 
         return Observable.create { emitter ->
 
@@ -263,6 +262,8 @@ class HudService private constructor() {
                 override fun onConnectFailed(p0: String) {
 
                     messageHandler?.log("连接蓝牙设备失败 $p0")
+
+
 
                     if (emitter.isDisposed) {
                         return
