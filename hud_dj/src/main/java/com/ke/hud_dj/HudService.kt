@@ -1,6 +1,5 @@
 package com.ke.hud_dj
 
-import android.app.Activity
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -17,7 +16,6 @@ import com.example.bletohud.bleDevice.OnAbsConnectListener
 import com.example.bletohud.bleDevice.OnAbsGetDataListener
 import com.example.bletohud.bleDevice.Update
 import com.example.bletohud.bleDevice.recevie.FirmwareInfo
-
 import com.ke.hud_dj.entity.*
 import com.ke.hud_dj.exception.NeedRetryException
 import com.ke.hud_dj.exception.RetryTimesOutExcrption
@@ -69,6 +67,15 @@ class HudService private constructor() {
 
             messageHandler?.log("action = ${intent.action}")
 
+
+            val bluetoothDevice: BluetoothDevice? =
+                intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+
+
+
+            messageHandler?.log(
+                "HudService 找到hud 设备 ${bluetoothDevice?.name} ${bluetoothDevice?.address} ${bluetoothDevice?.bondState} ${bluetoothDevice?.type}"
+            )
 
             when (intent.action) {
 
