@@ -269,7 +269,7 @@ class HudService private constructor() {
                         return
                     }
                     emitter.onNext(false)
-                    emitter.onComplete()
+//                    emitter.onComplete()
                 }
 
                 override fun onConnectSuccess(p0: String) {
@@ -281,7 +281,7 @@ class HudService private constructor() {
                         return
                     }
                     emitter.onNext(true)
-                    emitter.onComplete()
+//                    emitter.onComplete()
 
                 }
 
