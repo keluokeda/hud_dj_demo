@@ -86,6 +86,13 @@
                 android:text="发送一次导航信息"
                 />
 
+        <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/send_road_image"
+                android:text="发送道路图"
+                android:layout_margin="8dp"
+                />
 
         <Button
                 android:layout_width="match_parent"

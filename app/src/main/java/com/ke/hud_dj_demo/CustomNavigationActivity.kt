@@ -1,6 +1,14 @@
 package com.ke.hud_dj_demo
 
+import android.R
+import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.Button
+import android.widget.FrameLayout
 import com.amap.api.navi.AMapNavi
 import com.amap.api.navi.AMapNaviListener
 import com.amap.api.navi.AmapRouteActivity
@@ -36,7 +44,7 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
             )
         ).observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                loggerMessage("导航信息发送结果 $it")
+//                loggerMessage("导航信息发送结果 $it")
             }
             .addTo(compositeDisposable)
 
@@ -111,7 +119,11 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
     override fun onReCalculateRouteForTrafficJam() {
     }
 
-    override fun updateIntervalCameraInfo(p0: AMapNaviCameraInfo?, p1: AMapNaviCameraInfo?, p2: Int) {
+    override fun updateIntervalCameraInfo(
+        p0: AMapNaviCameraInfo?,
+        p1: AMapNaviCameraInfo?,
+        p2: Int
+    ) {
     }
 
     override fun hideLaneInfo() {
@@ -163,6 +175,10 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
     override fun onNaviRouteNotify(p0: AMapNaviRouteNotifyData?) {
     }
 
+    override fun onGpsSignalWeak(p0: Boolean) {
+
+    }
+
     override fun showLaneInfo(p0: Array<out AMapLaneInfo>?, p1: ByteArray?, p2: ByteArray?) {
     }
 
@@ -171,22 +187,77 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
 
     private lateinit var aMapNavi: AMapNavi
 
+    private lateinit var button: Button
+
+    private val listener: ViewTreeObserver.OnGlobalLayoutListener =
+        ViewTreeObserver.OnGlobalLayoutListener {
+
+            if (button.parent != null) {
+                (button.parent as? ViewGroup)?.removeView(button)
+                val frameLayout = findViewById<View>(R.id.content) as FrameLayout
+                frameLayout.addView(
+                    button, FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL
+                    )
+                )
+            }
+        }
+
 
     override fun onCreate(p0: Bundle?) {
         super.onCreate(p0)
 
+        loggerMessage("CustomNavigationActivity onCreate")
+
         aMapNavi = AMapNavi.getInstance(application)
 
+        aMapNavi.setEmulatorNaviSpeed(180)
         aMapNavi.setUseInnerVoice(true)
         aMapNavi.addAMapNaviListener(this)
+
+
+        val frameLayout = findViewById<View>(R.id.content) as FrameLayout
+
+        button = Button(this)
+        button.setOnClickListener {
+            val intent = Intent(this, ConnectActivity::class.java)
+            startActivity(intent)
+        }
+        button.text = "返回首页"
+        frameLayout.addView(
+            button, FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL
+            )
+        )
+
+        frameLayout.viewTreeObserver.addOnGlobalLayoutListener(listener)
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loggerMessage("CustomNavigationActivity onResume")
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        loggerMessage("CustomNavigationActivity onPause")
+
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
+        loggerMessage("CustomNavigationActivity onDestroy")
 
         aMapNavi.stopNavi()
         aMapNavi.destroy()
+        val frameLayout = findViewById<View>(R.id.content) as FrameLayout
+
+        frameLayout.viewTreeObserver.removeOnGlobalLayoutListener(listener)
     }
 
 

@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.support.annotation.CheckResult
 import com.example.bletohud.DJBTManager
@@ -17,6 +18,7 @@ import com.example.bletohud.bleDevice.Update
 import com.example.bletohud.bleDevice.listener.OnAbsConnectListener
 import com.example.bletohud.bleDevice.listener.OnAbsGetDataListener
 import com.example.bletohud.bleDevice.recevie.FirmwareInfo
+import com.example.bletohud.bleDevice.utils.ToolUtil
 import com.ke.hud_dj.entity.*
 import com.ke.hud_dj.exception.NeedRetryException
 import com.ke.hud_dj.exception.RetryTimesOutExcrption
@@ -26,11 +28,36 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.TimeUnit
 
 
 class HudService private constructor() {
+
+    init {
+        val key = byteArrayOf(
+            0x9A.toByte(),
+            0x5E.toByte(),
+            0x81.toByte(),
+            0x8A.toByte(),
+            0x85.toByte(),
+            0xAF.toByte(),
+            0xD1.toByte(),
+            0x65.toByte(),
+            0xCA.toByte(),
+            0xE7.toByte(),
+            0x7D.toByte(),
+            0x7C.toByte(),
+            0xCC.toByte(),
+            0x87.toByte(),
+            0xB7.toByte(),
+            0xF1.toByte()
+        )
+        ToolUtil.setUserKey(key)
+    }
+
     val connectStateSubject: Subject<DeviceConnectState> = BehaviorSubject.create()
 
 
@@ -384,7 +411,8 @@ class HudService private constructor() {
      * 发送摄像头信息
      */
     fun sendCameraInfoList(cameraInfoList: List<CameraInfo>) =
-        chatService.sender.sendListCameraInformation(cameraInfoList.map { toCameraInfo(it) }.toTypedArray())
+        chatService.sender.sendListCameraInformation(cameraInfoList.map { toCameraInfo(it) }
+            .toTypedArray())
 
 
     /**
@@ -393,11 +421,12 @@ class HudService private constructor() {
     fun sendRoadImage(bitmap: Bitmap, height: Int = 20): Boolean {
 
         val newBitmap = scaleBitmap(bitmap, height)
+        val compressedBitmap = compressBitmap(newBitmap,2)?: return false
 
-        messageHandler?.log("新的图片的宽度 = ${newBitmap.width} ， 高度 = ${newBitmap.height}")
+        messageHandler?.log("新的图片的宽度 = ${compressedBitmap.width} ， 高度 = ${compressedBitmap.height} ，图片大小${compressedBitmap.byteCount}")
 
 
-        return chatService.sender.sendRoadImageWithPositionX(0, 0, newBitmap, true)
+        return chatService.sender.sendRoadImageWithPositionX(0, 0, compressedBitmap, true)
     }
 
 
@@ -409,6 +438,20 @@ class HudService private constructor() {
         matrix.postScale(scale, scale)
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
+    }
+    private fun compressBitmap(bitmap: Bitmap, sizeLimit: Long): Bitmap? {
+        val baos = ByteArrayOutputStream()
+        var quality = 100
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
+
+        // 循环判断压缩后图片是否超过限制大小
+        while (baos.toByteArray().size / 1024 > sizeLimit) {
+            // 清空baos
+            baos.reset()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
+            quality -= 10
+        }
+        return BitmapFactory.decodeStream(ByteArrayInputStream(baos.toByteArray()), null, null)
     }
 
 

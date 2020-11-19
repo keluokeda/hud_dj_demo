@@ -27,7 +27,9 @@
                 android:value="acfae1c4d0284a1d747b25e3dedd5c46"/>
 
 
-        <activity android:name=".ConnectActivity">
+        <activity android:name=".ConnectActivity"
+                android:launchMode="singleInstance"
+                >
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -47,6 +49,13 @@
                 android:label="自定义Activity导航组件"
                 android:screenOrientation="portrait"
                 android:theme="@android:style/Theme.Light.NoTitleBar"/>
+
+        <activity
+                android:name=".CustomAmapRouteActivity"
+                android:configChanges="orientation|keyboardHidden|screenSize|navigation"
+                android:label="自定义Activity导航组件"
+                android:screenOrientation="portrait"
+                android:theme="@android:style/Theme.Light.NoTitleBar" />
     </application>
 
 </manifest>

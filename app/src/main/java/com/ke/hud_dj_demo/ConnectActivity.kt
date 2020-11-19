@@ -57,6 +57,8 @@ class ConnectActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
 
+        loggerMessage("ConnectActivity onCreate")
+
 
         registerReceiver(hudService.receiver, HudService.intentFilter)
 
@@ -104,7 +106,12 @@ class ConnectActivity : AppCompatActivity() {
         if (item.itemId == R.id.action_navigation) {
 
             AmapNaviPage.getInstance()
-                .showRouteActivity(this, AmapNaviParams(null), null, CustomNavigationActivity::class.java)
+                .showRouteActivity(
+                    this,
+                    AmapNaviParams(null),
+                    null,
+                    CustomNavigationActivity::class.java
+                )
 
             return true
         }
@@ -129,7 +136,17 @@ class ConnectActivity : AppCompatActivity() {
         send_navigation.setOnClickListener {
 
 
-            hudService.sendNavigationInformationWithDirection(NavigationInfo(3, 100, "当前道路", "下一个道路", 100, 1000, 60))
+            hudService.sendNavigationInformationWithDirection(
+                NavigationInfo(
+                    3,
+                    100,
+                    "当前道路",
+                    "下一个道路",
+                    100,
+                    1000,
+                    60
+                )
+            )
                 .subscribe({
                     "发送导航信息结果 $it".log()
                 }, {
@@ -138,9 +155,39 @@ class ConnectActivity : AppCompatActivity() {
                 .addTo(compositeDisposable)
         }
 
+        send_road_image.setOnClickListener {
+
+            hudService.sendNavigationInformationWithDirection(
+                NavigationInfo(
+                    3,
+                    100,
+                    "当前道路",
+                    "下一个道路",
+                    100,
+                    1000,
+                    60
+                )
+            ).map {
+                hudService.sendRoadImage(BitmapFactory.decodeResource(resources, R.mipmap.road))
+
+            }.subscribe {
+                "发送车道图结果 $it".log()
+            }.addTo(compositeDisposable)
+
+        }
         send_image.setOnClickListener {
 
-            hudService.sendNavigationInformationWithDirection(NavigationInfo(3, 100, "当前道路", "下一个道路", 100, 1000, 60))
+            hudService.sendNavigationInformationWithDirection(
+                NavigationInfo(
+                    3,
+                    100,
+                    "当前道路",
+                    "下一个道路",
+                    100,
+                    1000,
+                    60
+                )
+            )
 
                 .flatMap {
 
@@ -220,7 +267,12 @@ class ConnectActivity : AppCompatActivity() {
         send_camera_info_list.setOnClickListener {
 
             val result =
-                hudService.sendCameraInfoList(listOf(CameraInfo(1, 80, 200, 0.0, 0.0), CameraInfo(3, 90, 200, .0, .0)))
+                hudService.sendCameraInfoList(
+                    listOf(
+                        CameraInfo(1, 80, 200, 0.0, 0.0),
+                        CameraInfo(3, 90, 200, .0, .0)
+                    )
+                )
 
             loggerMessage("发送摄像机信息结果 $result")
         }
@@ -257,7 +309,7 @@ class ConnectActivity : AppCompatActivity() {
                 "取消发送心跳包".log()
             }
             .subscribe {
-                "心跳包发送结果 ${it.first} ${it.second}".log()
+//                "心跳包发送结果 ${it.first} ${it.second}".log()
             }
     }
 
@@ -289,6 +341,11 @@ class ConnectActivity : AppCompatActivity() {
             .addTo(compositeDisposable)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        loggerMessage("ConnectActivity onNewIntent")
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -299,5 +356,6 @@ class ConnectActivity : AppCompatActivity() {
         unregisterReceiver(hudService.receiver)
 
         hudService.disconnect()
+        loggerMessage("ConnectActivity onDestroy")
     }
 }

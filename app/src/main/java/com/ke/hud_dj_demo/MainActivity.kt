@@ -8,25 +8,29 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import com.amap.api.navi.AmapNaviPage
+import com.amap.api.navi.AmapNaviParams
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
 
-
-
     private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
-    private val adapter = object : BaseQuickAdapter<BluetoothDevice, BaseViewHolder>(R.layout.item_bluetooth) {
-        override fun convert(helper: BaseViewHolder, item: BluetoothDevice) {
-            helper.setText(R.id.name, item.name)
-                .setText(R.id.address, item.address)
-        }
+    private val adapter =
+        object : BaseQuickAdapter<BluetoothDevice, BaseViewHolder>(R.layout.item_bluetooth) {
+            override fun convert(helper: BaseViewHolder, item: BluetoothDevice) {
+                helper.setText(R.id.name, item.name)
+                    .setText(R.id.address, item.address)
+            }
 
-    }
+        }
 
 
     private val bluetoothReceiver = object : BroadcastReceiver() {
@@ -34,9 +38,16 @@ class MainActivity : AppCompatActivity() {
 
             when (intent.action) {
                 BluetoothDevice.ACTION_FOUND -> {
-                    val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                    val device =
+                        intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+
+
+                    val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, 0)
+
 
                     val deviceName = device.name ?: ""
+
+                    Logger.d("发现设备 name = $deviceName rssi = $rssi")
 
                     if (!deviceName.startsWith("Hud_")) {
                         return
@@ -89,6 +100,7 @@ class MainActivity : AppCompatActivity() {
             val newIntent = Intent(this, ConnectActivity::class.java)
             newIntent.putExtra(BluetoothDevice.EXTRA_DEVICE, device)
             startActivity(newIntent)
+            finish()
 
         }
 
@@ -114,4 +126,29 @@ class MainActivity : AppCompatActivity() {
         unregisterReceiver(bluetoothReceiver)
     }
 
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menu?.add(0, 101, 0, "导航")
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (101 == item?.itemId) {
+            toNavigationView()
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun toNavigationView() {
+        AmapNaviPage.getInstance()
+            .showRouteActivity(
+                applicationContext,
+                AmapNaviParams(null).apply {
+                    isNeedDestroyDriveManagerInstanceWhenNaviExit = false
+                },
+                null
+            )
+    }
 }
