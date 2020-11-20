@@ -66,7 +66,7 @@ class HudService private constructor() {
     @Suppress("MemberVisibilityCanBePrivate")
     val reconnectResultSubject = PublishSubject.create<Boolean>()
 
-    private var lastNavigationInfo:NavigationInfo? = null
+    private var lastNavigationInfo: NavigationInfo? = null
 
     /**
      * 是否自动重连
@@ -326,6 +326,11 @@ class HudService private constructor() {
 
 
     /**
+     * 发送时间给hud
+     */
+    fun sendTime() = chatService.sender.sendTime()
+
+    /**
      * 断开连接
      */
     fun disconnect() {
@@ -373,8 +378,8 @@ class HudService private constructor() {
     /**
      * 导航关闭时调用这个方法
      */
-    fun onNavigationDestroy():Boolean {
-       return chatService.sender.sendNavigationInformationWithDirection(
+    fun onNavigationDestroy(): Boolean {
+        return chatService.sender.sendNavigationInformationWithDirection(
             255,
             0,
             "",
@@ -395,7 +400,7 @@ class HudService private constructor() {
     /**
      * 取消图片
      */
-    fun clearImage():Boolean =
+    fun clearImage(): Boolean =
         chatService.sender.clearImg()
 
 
@@ -430,8 +435,6 @@ class HudService private constructor() {
 
         return chatService.sender.sendRoadImageWithPositionX(0, 0, compressedBitmap, true)
     }
-
-
 
 
     private fun scaleBitmap(bitmap: Bitmap, height: Int): Bitmap {
