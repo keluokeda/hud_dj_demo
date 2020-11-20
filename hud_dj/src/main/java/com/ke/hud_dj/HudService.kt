@@ -63,7 +63,8 @@ class HudService private constructor() {
 
     private var reconnectDisposable: Disposable? = null
 
-    private val reconnectResultSubject = PublishSubject.create<Boolean>()
+    @Suppress("MemberVisibilityCanBePrivate")
+    val reconnectResultSubject = PublishSubject.create<Boolean>()
 
     private var lastNavigationInfo:NavigationInfo? = null
 
