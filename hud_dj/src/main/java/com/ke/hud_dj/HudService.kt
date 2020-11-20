@@ -63,13 +63,14 @@ class HudService private constructor() {
 
     private var reconnectDisposable: Disposable? = null
 
-    val reconnectResultSubject = PublishSubject.create<Boolean>()
+    private val reconnectResultSubject = PublishSubject.create<Boolean>()
 
+    private var lastNavigationInfo:NavigationInfo? = null
 
     /**
      * 是否自动重连
      */
-    var autoReconnect = true
+    private var autoReconnect = true
 
 
     private var isUserQuit = false
@@ -81,6 +82,7 @@ class HudService private constructor() {
      * 重连尝试次数
      */
     private val maxRetryCount = 3
+
     /**
      * 重试间隔
      */
@@ -346,37 +348,32 @@ class HudService private constructor() {
     /**
      * 发送心跳包
      */
-    @CheckResult
     fun sendHeart(): Boolean = chatService.sender.sentHeart()
 
     /**
      * 发送导航信息
      */
-    @CheckResult
     fun sendNavigationInformationWithDirection(
         navigationInfo: NavigationInfo
-    ): Observable<Boolean> {
+    ): Boolean {
+        lastNavigationInfo = navigationInfo
+        return chatService.sender.sendNavigationInformationWithDirection(
+            if (navigationInfo.currentStepRetainDistance >= 2000) 9 else navigationInfo.iconType,
+            navigationInfo.currentStepRetainDistance,
+            navigationInfo.currentRoadName,
+            navigationInfo.nextRoadName,
+            navigationInfo.pathRetainTime,
+            navigationInfo.pathRetainDistance,
+            navigationInfo.currentSpeed
+        )
 
-
-//        chatService.state
-
-        return Observable.just(1)
-            .observeOn(Schedulers.io())
-            .map {
-                chatService.sender.sendNavigationInformationWithDirection(
-                    if (navigationInfo.currentStepRetainDistance >= 2000) 9 else navigationInfo.iconType,
-                    navigationInfo.currentStepRetainDistance,
-                    navigationInfo.currentRoadName,
-                    navigationInfo.nextRoadName,
-                    navigationInfo.pathRetainTime,
-                    navigationInfo.pathRetainDistance,
-                    navigationInfo.currentSpeed
-                )
-            }
     }
 
-    fun onNavigationDestroy() {
-        chatService.sender.sendNavigationInformationWithDirection(
+    /**
+     * 导航关闭时调用这个方法
+     */
+    fun onNavigationDestroy():Boolean {
+       return chatService.sender.sendNavigationInformationWithDirection(
             255,
             0,
             "",
@@ -387,17 +384,18 @@ class HudService private constructor() {
     /**
      * 发送图片
      */
-    @CheckResult
-    fun sendImage(bitmap: Bitmap): Observable<Boolean> {
-        return Observable.just(chatService.sender.sendImg(bitmap)).subscribeOn(Schedulers.io())
+    fun sendImage(bitmap: Bitmap): Boolean {
+        lastNavigationInfo?.apply {
+            sendNavigationInformationWithDirection(this)
+        }
+        return chatService.sender.sendImg(bitmap)
     }
 
     /**
      * 取消图片
      */
-    @CheckResult
-    fun clearImage(): Observable<Boolean> =
-        Observable.just(chatService.sender.clearImg()).subscribeOn(Schedulers.io())
+    fun clearImage():Boolean =
+        chatService.sender.clearImg()
 
 
     /**
@@ -419,15 +417,20 @@ class HudService private constructor() {
      * 发送道路图片
      */
     fun sendRoadImage(bitmap: Bitmap, height: Int = 20): Boolean {
+        lastNavigationInfo?.apply {
+            sendNavigationInformationWithDirection(this)
+        }
 
         val newBitmap = scaleBitmap(bitmap, height)
-        val compressedBitmap = compressBitmap(newBitmap,2)?: return false
+        val compressedBitmap = compressBitmap(newBitmap, 2) ?: return false
 
         messageHandler?.log("新的图片的宽度 = ${compressedBitmap.width} ， 高度 = ${compressedBitmap.height} ，图片大小${compressedBitmap.byteCount}")
 
 
         return chatService.sender.sendRoadImageWithPositionX(0, 0, compressedBitmap, true)
     }
+
+
 
 
     private fun scaleBitmap(bitmap: Bitmap, height: Int): Bitmap {
@@ -439,6 +442,7 @@ class HudService private constructor() {
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
     }
+
     private fun compressBitmap(bitmap: Bitmap, sizeLimit: Long): Bitmap? {
         val baos = ByteArrayOutputStream()
         var quality = 100

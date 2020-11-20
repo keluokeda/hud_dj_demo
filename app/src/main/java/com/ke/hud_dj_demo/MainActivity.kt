@@ -1,5 +1,6 @@
 package com.ke.hud_dj_demo
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
@@ -16,6 +17,7 @@ import com.amap.api.navi.AmapNaviParams
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.orhanobut.logger.Logger
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -79,6 +81,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        RxPermissions(this)
+            .request(Manifest.permission.ACCESS_COARSE_LOCATION)
+            .subscribe()
 
         val intentFilter = IntentFilter()
             .apply {

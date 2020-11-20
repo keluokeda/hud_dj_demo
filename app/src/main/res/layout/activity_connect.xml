@@ -93,7 +93,13 @@
                 android:text="发送道路图"
                 android:layout_margin="8dp"
                 />
-
+        <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cancel_send_road_image"
+                android:text="取消发送道路图"
+                android:layout_margin="8dp"
+                />
         <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

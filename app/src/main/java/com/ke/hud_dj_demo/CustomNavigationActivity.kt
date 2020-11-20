@@ -42,11 +42,7 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
                 info.pathRetainDistance,
                 info.currentSpeed
             )
-        ).observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-//                loggerMessage("导航信息发送结果 $it")
-            }
-            .addTo(compositeDisposable)
+        )
 
     }
 
@@ -89,9 +85,7 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
     override fun showCross(p0: AMapNaviCross) {
 
         hudService.sendImage(p0.bitmap)
-            .subscribe {
-                loggerMessage("发送图片结果 $it")
-            }.addTo(compositeDisposable)
+
     }
 
     override fun onGetNavigationText(p0: Int, p1: String?) {
@@ -105,9 +99,7 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
 
     override fun hideCross() {
         hudService.clearImage()
-            .subscribe {
-                loggerMessage("清除图片结果 $it")
-            }.addTo(compositeDisposable)
+
     }
 
     override fun onInitNaviFailure() {

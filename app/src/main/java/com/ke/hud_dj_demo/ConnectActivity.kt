@@ -147,12 +147,7 @@ class ConnectActivity : AppCompatActivity() {
                     60
                 )
             )
-                .subscribe({
-                    "发送导航信息结果 $it".log()
-                }, {
-                    it.printStackTrace()
-                })
-                .addTo(compositeDisposable)
+
         }
 
         send_road_image.setOnClickListener {
@@ -167,13 +162,15 @@ class ConnectActivity : AppCompatActivity() {
                     1000,
                     60
                 )
-            ).map {
-                hudService.sendRoadImage(BitmapFactory.decodeResource(resources, R.mipmap.road))
+            )
+            hudService.sendRoadImage(BitmapFactory.decodeResource(resources, R.mipmap.road))
 
-            }.subscribe {
-                "发送车道图结果 $it".log()
-            }.addTo(compositeDisposable)
 
+        }
+
+        cancel_send_road_image.setOnClickListener {
+            val result = hudService.clearRoadImage()
+            "取消车道图结果 $result".log()
         }
         send_image.setOnClickListener {
 
@@ -188,35 +185,20 @@ class ConnectActivity : AppCompatActivity() {
                     60
                 )
             )
+            hudService.sendImage(
+                BitmapFactory.decodeResource(
+                    resources,
+                    R.mipmap.navi_cross
+                ).apply {
+                    "图片大小 ${this.byteCount}".log()
+                })
 
-                .flatMap {
 
-
-                    return@flatMap hudService.sendImage(
-                        BitmapFactory.decodeResource(
-                            resources,
-                            R.mipmap.navi_cross
-                        ).apply {
-                            "图片大小 ${this.byteCount}".log()
-                        })
-                }
-
-                .doOnComplete {
-                    "发送图片完成".log()
-                }
-                .subscribe {
-                    "发送图片结果 $it".log()
-                }.addTo(compositeDisposable)
         }
 
         clear_image.setOnClickListener {
             hudService.clearImage()
-                .doOnComplete {
-                    "清除图片完成".log()
-                }
-                .subscribe {
-                    "清除图片结果 $it".log()
-                }.addTo(compositeDisposable)
+
         }
 
         navigation_loop.setOnClickListener {
@@ -226,7 +208,7 @@ class ConnectActivity : AppCompatActivity() {
             navigationLoopDisposable?.dispose()
 
             navigationLoopDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
-                .flatMap {
+                .map {
                     start++
 
                     hudService.sendNavigationInformationWithDirection(
@@ -239,9 +221,9 @@ class ConnectActivity : AppCompatActivity() {
                             1000,
                             60
                         )
-                    ).map { result ->
-                        return@map result to start
-                    }
+                    )
+                }.map { result ->
+                    return@map result to start
                 }
                 .doOnDispose {
                     loggerMessage("取消循环发送导航信息 已发次数 $start")
