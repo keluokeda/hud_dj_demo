@@ -65,6 +65,7 @@ class ConnectActivity : AppCompatActivity() {
 
         hudService.connectStateSubject.observeOn(AndroidSchedulers.mainThread())
             .subscribe { connectState ->
+                "状态变化 ${connectState.name}".log()
                 when (connectState) {
                     DeviceConnectState.Connected -> device_state.setImageResource(R.drawable.ic_bluetooth_connected_green_500_24dp)
                     DeviceConnectState.Connecting -> {

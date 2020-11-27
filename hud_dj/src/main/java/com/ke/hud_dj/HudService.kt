@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.support.annotation.CheckResult
+import android.text.TextUtils
 import com.example.bletohud.DJBTManager
 import com.example.bletohud.bleDevice.CamerasInfo
 
@@ -100,24 +101,31 @@ class HudService private constructor() {
 
 
             val bluetoothDevice: BluetoothDevice? =
-                intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
 
 
 
             messageHandler?.log(
-                "HudService 找到hud 设备 ${bluetoothDevice?.name} ${bluetoothDevice?.address} ${bluetoothDevice?.bondState} ${bluetoothDevice?.type}"
+                "HudService 找到hud 设备 name = ${bluetoothDevice?.name},address =  ${bluetoothDevice?.address},bondState ${bluetoothDevice?.bondState},type ${bluetoothDevice?.type},当前蓝牙地址 $bluetoothDeviceAddress"
             )
 
-            when (intent.action) {
+            if (bluetoothDeviceAddress != null && TextUtils.equals(
+                    bluetoothDeviceAddress,
+                    bluetoothDevice?.address
+                )
+            ) {
+
+                when (intent.action) {
 
 
-                BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                    connectStateSubject.onNext(DeviceConnectState.Connected)
-                }
+                    BluetoothDevice.ACTION_ACL_CONNECTED -> {
+                        connectStateSubject.onNext(DeviceConnectState.Connected)
+                    }
 
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    connectStateSubject.onNext(DeviceConnectState.Disconnected)
-                    onDeviceDisconnected()
+                    BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                        connectStateSubject.onNext(DeviceConnectState.Disconnected)
+                        onDeviceDisconnected()
+                    }
                 }
             }
         }
