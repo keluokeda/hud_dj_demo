@@ -333,14 +333,17 @@ class HudService private constructor() {
     /**
      * 断开连接
      */
-    fun disconnect() {
+    fun disconnect(needReconnect: Boolean = false) {
         messageHandler?.log("用户点击断开连接")
         chatService.stop()
         connectStateSubject.onNext(DeviceConnectState.Disconnected)
 
-        isUserQuit = true
+        if (!needReconnect) {
 
-        reconnectDisposable?.dispose()
+            isUserQuit = true
+
+            reconnectDisposable?.dispose()
+        }
 
 
 //        Observable.timer(5, TimeUnit.SECONDS)
