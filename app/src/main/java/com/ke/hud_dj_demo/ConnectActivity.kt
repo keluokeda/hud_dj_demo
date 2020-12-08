@@ -2,14 +2,11 @@ package com.ke.hud_dj_demo
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.BitmapFactory
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.amap.api.navi.AmapNaviPage
@@ -18,7 +15,6 @@ import com.ke.hud_dj.HudService
 import com.ke.hud_dj.entity.CameraInfo
 import com.ke.hud_dj.entity.DeviceConnectState
 import com.ke.hud_dj.entity.NavigationInfo
-import com.orhanobut.logger.Logger
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

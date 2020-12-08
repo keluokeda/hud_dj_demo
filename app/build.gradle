@@ -50,6 +50,9 @@ dependencies {
 
     implementation 'com.amap.api:navi-3dmap:7.5.0_3dmap7.5.0'//7.6.0有导航组件不能搜索 7.7.0会更新
 
+//    implementation 'com.github.keluokeda:AddressPicker:1.0.3'
+
+
 //    implementation 'com.amap.api:navi-3dmap:6.9.0_3dmap6.9.2'
 
 }
