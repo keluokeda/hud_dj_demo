@@ -1,14 +1,7 @@
 package com.ke.hud_dj_demo
 
-import android.R
-import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.Button
-import android.widget.FrameLayout
 import com.amap.api.navi.AMapNavi
 import com.amap.api.navi.AMapNaviListener
 import com.amap.api.navi.AmapRouteActivity
@@ -17,9 +10,11 @@ import com.autonavi.tbt.TrafficFacilityInfo
 import com.ke.hud_dj.HudService
 import com.ke.hud_dj.entity.CameraInfo
 import com.ke.hud_dj.entity.NavigationInfo
-import io.reactivex.android.schedulers.AndroidSchedulers
+import com.ke.hud_dj.entity.NavigationTrafficStatus
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.PublishSubject
+import java.util.concurrent.TimeUnit
 
 class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
 
@@ -29,7 +24,20 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
     private val hudService = HudService.hudService
 
 
+    private val updateTrafficStatusSubject = PublishSubject.create<Float>()
+
+    private var totalDistance: Int? = null
+
+    private var currentProgress = 0f
     override fun onNaviInfoUpdate(info: NaviInfo) {
+        if (totalDistance == null) {
+            totalDistance = info.pathRetainDistance
+        } else {
+            currentProgress =
+                (totalDistance!! - info.pathRetainDistance) / (totalDistance!! * 1f)
+//            loggerMessage("更新进度 $currentProgress 剩余距离 ${info.pathRetainDistance} 总距离 ${totalDistance!!}")
+            updateTrafficStatusSubject.onNext(currentProgress)
+        }
 
 
         hudService.sendNavigationInformationWithDirection(
@@ -44,6 +52,9 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
             )
         )
 
+    }
+
+    override fun onNaviInfoUpdated(p0: AMapNaviInfo?) {
     }
 
     override fun onCalculateRouteSuccess(p0: IntArray?) {
@@ -73,7 +84,21 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
     override fun onPlayRing(p0: Int) {
     }
 
+    var trafficStatusList = emptyList<NavigationTrafficStatus>()
+
     override fun onTrafficStatusUpdate() {
+        val list = aMapNavi.naviPath.trafficStatuses
+
+        trafficStatusList = list.map {
+            NavigationTrafficStatus(
+                length = it.length,
+                status = it.status
+            )
+        }
+
+        "开始更新光柱图 ".log()
+
+
     }
 
     override fun onGpsOpenStatus(p0: Boolean) {
@@ -121,8 +146,6 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
     override fun hideLaneInfo() {
     }
 
-    override fun onNaviInfoUpdated(p0: AMapNaviInfo?) {
-    }
 
     override fun showModeCross(p0: AMapModelCross?) {
     }
@@ -155,14 +178,18 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
     override fun notifyParallelRoad(p0: Int) {
     }
 
-    override fun OnUpdateTrafficFacility(p0: AMapNaviTrafficFacilityInfo?) {
+    override fun OnUpdateTrafficFacility(p0: Array<out AMapNaviTrafficFacilityInfo>?) {
+
     }
 
-    override fun OnUpdateTrafficFacility(p0: Array<out AMapNaviTrafficFacilityInfo>?) {
+    override fun OnUpdateTrafficFacility(p0: AMapNaviTrafficFacilityInfo?) {
+
     }
 
     override fun OnUpdateTrafficFacility(p0: TrafficFacilityInfo?) {
+
     }
+
 
     override fun onNaviRouteNotify(p0: AMapNaviRouteNotifyData?) {
     }
@@ -179,23 +206,6 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
 
     private lateinit var aMapNavi: AMapNavi
 
-    private lateinit var button: Button
-
-    private val listener: ViewTreeObserver.OnGlobalLayoutListener =
-        ViewTreeObserver.OnGlobalLayoutListener {
-
-            if (button.parent != null) {
-                (button.parent as? ViewGroup)?.removeView(button)
-                val frameLayout = findViewById<View>(R.id.content) as FrameLayout
-                frameLayout.addView(
-                    button, FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL
-                    )
-                )
-            }
-        }
-
 
     override fun onCreate(p0: Bundle?) {
         super.onCreate(p0)
@@ -208,23 +218,18 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
         aMapNavi.setUseInnerVoice(true)
         aMapNavi.addAMapNaviListener(this)
 
-
-        val frameLayout = findViewById<View>(R.id.content) as FrameLayout
-
-        button = Button(this)
-        button.setOnClickListener {
-            val intent = Intent(this, ConnectActivity::class.java)
-            startActivity(intent)
-        }
-        button.text = "返回首页"
-        frameLayout.addView(
-            button, FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL
-            )
-        )
-
-        frameLayout.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        updateTrafficStatusSubject.throttleFirst(1, TimeUnit.SECONDS)
+            .subscribe {
+                "更新光柱图 $currentProgress".log()
+                hudService.sendTrafficStatus(
+                    BitmapFactory.decodeResource(
+                        resources,
+                        com.ke.hud_dj_demo.R.drawable.progress_pointer
+                    ),
+                    trafficStatusList,
+                    currentProgress
+                )
+            }.addTo(compositeDisposable)
 
     }
 
@@ -247,9 +252,8 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
 
         aMapNavi.stopNavi()
         aMapNavi.destroy()
-        val frameLayout = findViewById<View>(R.id.content) as FrameLayout
+        compositeDisposable.dispose()
 
-        frameLayout.viewTreeObserver.removeOnGlobalLayoutListener(listener)
     }
 
 

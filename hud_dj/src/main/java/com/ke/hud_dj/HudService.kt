@@ -10,10 +10,12 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.support.annotation.CheckResult
+import androidx.annotation.CheckResult
 import android.text.TextUtils
+import androidx.annotation.IntRange
 import com.example.bletohud.DJBTManager
 import com.example.bletohud.bleDevice.CamerasInfo
+import com.example.bletohud.bleDevice.NaviTrafficStatus
 
 import com.example.bletohud.bleDevice.Update
 import com.example.bletohud.bleDevice.listener.OnAbsConnectListener
@@ -361,6 +363,27 @@ class HudService private constructor() {
 //            }
     }
 
+
+    /**
+     * 发送路况光柱图
+     */
+    fun sendTrafficStatus(
+        pointerBitmap: Bitmap,
+        list: List<NavigationTrafficStatus>,
+        progress: Float
+    ) {
+        val target = list.map {
+            NaviTrafficStatus()
+                .apply {
+                    length = it.length
+                    status = it.status
+                }
+        }
+        val bitmap = chatService.getTrafficBitmap(target)
+        val result =
+            chatService.combineBitmap(bitmap, scaleBitmap(pointerBitmap, 8), progress)
+        chatService.sender.sendTrafficStatus(target, result)
+    }
 
     /**
      * 发送心跳包

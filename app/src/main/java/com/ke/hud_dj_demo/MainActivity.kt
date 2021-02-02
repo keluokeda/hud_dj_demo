@@ -8,7 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             when (intent.action) {
                 BluetoothDevice.ACTION_FOUND -> {
                     val device =
-                        intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                        intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)?: return
 
 
                     val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, 0)
@@ -133,13 +133,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menu?.add(0, 101, 0, "导航")
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menu.add(0, 101, 0, "导航")
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (101 == item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (101 == item.itemId) {
             toNavigationView()
             return true
         }

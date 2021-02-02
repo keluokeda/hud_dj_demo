@@ -5,16 +5,18 @@ import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.amap.api.navi.AmapNaviPage
 import com.amap.api.navi.AmapNaviParams
+import com.ke.addresspicker.RxAddressPicker
 import com.ke.hud_dj.HudService
 import com.ke.hud_dj.entity.CameraInfo
 import com.ke.hud_dj.entity.DeviceConnectState
 import com.ke.hud_dj.entity.NavigationInfo
+import com.ke.hud_dj.entity.NavigationTrafficStatus
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -22,6 +24,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.activity_connect.*
 import java.util.concurrent.TimeUnit
+import kotlin.contracts.Returns
 
 class ConnectActivity : AppCompatActivity() {
     private lateinit var device: BluetoothDevice
@@ -72,10 +75,9 @@ class ConnectActivity : AppCompatActivity() {
             }.addTo(compositeDisposable)
 
         device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+            ?: throw RuntimeException("需要传入 BluetoothDevice")
 
-        if (device == null) {
-            finish()
-        }
+
 
 
         device_detail.text =
@@ -118,6 +120,14 @@ class ConnectActivity : AppCompatActivity() {
     }
 
     private fun initListener() {
+        pickAddress.setOnClickListener {
+            RxAddressPicker(this)
+                .pick()
+                .subscribe {
+
+                }
+        }
+
         connect.setOnClickListener { connectDevice() }
 
         disconnect.setOnClickListener { hudService.disconnect() }
@@ -276,6 +286,17 @@ class ConnectActivity : AppCompatActivity() {
 
         refresh_state.setOnClickListener {
             refresh_state.text = "刷新状态 = ${hudService.connectState.name}"
+        }
+
+        send_traffic_status.setOnClickListener {
+            hudService.sendTrafficStatus(
+                BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.progress_pointer
+                ),
+                listOf(NavigationTrafficStatus(100, 0), NavigationTrafficStatus(50, 1)),
+                seek_bar.progress / 100f
+            )
         }
     }
 
