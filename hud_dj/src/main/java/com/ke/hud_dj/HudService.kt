@@ -450,6 +450,7 @@ class HudService private constructor() {
      */
     fun sendCameraInfoList(cameraInfoList: List<CameraInfo>) =
         chatService.sender.sendListCameraInformation(cameraInfoList.map { toCameraInfo(it) }
+            .filter { it.cameraDistance < 500 }
             .toTypedArray())
 
 
