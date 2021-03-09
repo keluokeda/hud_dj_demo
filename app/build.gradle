@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.22'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
-    implementation 'com.amap.api:navi-3dmap:7.5.0_3dmap7.5.0'//7.6.0有导航组件不能搜索 7.7.0模拟导航不更新光柱图
+    implementation 'com.amap.api:navi-3dmap:7.7.0_3dmap7.7.0'//7.6.0有导航组件不能搜索 7.7.0模拟导航不更新光柱图
 
     implementation 'com.github.keluokeda:AddressPicker:1.0.3'
 

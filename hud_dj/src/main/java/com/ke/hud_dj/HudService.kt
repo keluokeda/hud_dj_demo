@@ -444,6 +444,10 @@ class HudService private constructor() {
     fun sendPhoneWithName(phone: String, name: String?) =
         chatService.sender.sendPhoneWithName(1, phone, name)
 
+    /**
+     * 取消显示来电
+     */
+    fun cancelSendPhone() = chatService.sender.sendPhoneWithName(0,"","")
 
     /**
      * 发送摄像头信息

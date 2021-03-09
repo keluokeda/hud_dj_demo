@@ -150,11 +150,10 @@ class MainActivity : AppCompatActivity() {
     private fun toNavigationView() {
         AmapNaviPage.getInstance()
             .showRouteActivity(
-                applicationContext,
-                AmapNaviParams(null).apply {
-                    isNeedDestroyDriveManagerInstanceWhenNaviExit = false
-                },
-                null
+                this,
+                AmapNaviParams(null),
+                null,
+                CustomNavigationActivity::class.java
             )
     }
 }

@@ -6,7 +6,6 @@ import com.amap.api.navi.AMapNavi
 import com.amap.api.navi.AMapNaviListener
 import com.amap.api.navi.AmapRouteActivity
 import com.amap.api.navi.model.*
-import com.autonavi.tbt.TrafficFacilityInfo
 import com.ke.hud_dj.HudService
 import com.ke.hud_dj.entity.CameraInfo
 import com.ke.hud_dj.entity.NavigationInfo
@@ -54,8 +53,8 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
 
     }
 
-    override fun onNaviInfoUpdated(p0: AMapNaviInfo?) {
-    }
+//    override fun onNaviInfoUpdated(p0: AMapNaviInfo?) {
+//    }
 
     override fun onCalculateRouteSuccess(p0: IntArray?) {
     }
@@ -183,12 +182,19 @@ class CustomNavigationActivity : AmapRouteActivity(), AMapNaviListener {
     }
 
     override fun OnUpdateTrafficFacility(p0: AMapNaviTrafficFacilityInfo?) {
-
     }
 
-    override fun OnUpdateTrafficFacility(p0: TrafficFacilityInfo?) {
-
-    }
+//    override fun OnUpdateTrafficFacility(p0: Array<out AMapNaviTrafficFacilityInfo>?) {
+//
+//    }
+//
+//    override fun OnUpdateTrafficFacility(p0: AMapNaviTrafficFacilityInfo?) {
+//
+//    }
+//
+//    override fun OnUpdateTrafficFacility(p0: TrafficFacilityInfo?) {
+//
+//    }
 
 
     override fun onNaviRouteNotify(p0: AMapNaviRouteNotifyData?) {
