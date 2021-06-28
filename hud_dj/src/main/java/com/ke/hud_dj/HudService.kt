@@ -428,7 +428,10 @@ class HudService private constructor() {
         lastNavigationInfo?.apply {
             sendNavigationInformationWithDirection(this)
         }
-        return chatService.sender.sendImg(bitmap)
+        val newBitmap = scaleBitmap(bitmap, 160)
+        val compressedBitmap = compressBitmap(newBitmap, 8) ?: return false
+        messageHandler?.log("图片大小 ${compressedBitmap.byteCount}")
+        return chatService.sender.sendImg(compressedBitmap)
     }
 
     /**
@@ -447,7 +450,7 @@ class HudService private constructor() {
     /**
      * 取消显示来电
      */
-    fun cancelSendPhone() = chatService.sender.sendPhoneWithName(0,"","")
+    fun cancelSendPhone() = chatService.sender.sendPhoneWithName(0, "", "")
 
     /**
      * 发送摄像头信息
@@ -492,7 +495,7 @@ class HudService private constructor() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
 
         // 循环判断压缩后图片是否超过限制大小
-        while (baos.toByteArray().size / 1024 > sizeLimit) {
+        while (baos.toByteArray().size / 1024 > sizeLimit && quality > 0) {
             // 清空baos
             baos.reset()
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)

@@ -54,6 +54,9 @@ class MainActivity : AppCompatActivity() {
                     if (!deviceName.startsWith("Hud_")) {
                         return
                     }
+                    if(device.type != BluetoothDevice.DEVICE_TYPE_CLASSIC){
+                        return
+                    }
 
                     if (adapter.data.map { it.address }.contains(device.address)) {
                         return
