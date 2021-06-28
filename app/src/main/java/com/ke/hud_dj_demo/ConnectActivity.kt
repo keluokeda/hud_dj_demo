@@ -3,6 +3,7 @@ package com.ke.hud_dj_demo
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
@@ -23,6 +24,10 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.activity_connect.*
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.contracts.Returns
 
@@ -192,14 +197,16 @@ class ConnectActivity : AppCompatActivity() {
                     60
                 )
             )
+            val bitmap = BitmapFactory.decodeResource(
+                resources,
+                R.mipmap.navi_cross
+            )
+            val target = hudService.compressBitmap(hudService.scaleBitmap(bitmap, 160), 16)
+                ?: return@setOnClickListener
             hudService.sendImage(
-                BitmapFactory.decodeResource(
-                    resources,
-                    R.mipmap.navi_cross
-                ).apply {
-                    "图片大小 ${this.byteCount}".log()
-                })
-
+                target
+            )
+            saveBitmap(target,"_")
 
         }
 
@@ -299,7 +306,25 @@ class ConnectActivity : AppCompatActivity() {
             )
         }
     }
+    private fun saveBitmap(bitmap: Bitmap, type: String) {
+        if (BuildConfig.DEBUG) {
 
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+
+            val parent = File(filesDir, "hud_navigation")
+
+            if (!parent.exists()) {
+                parent.mkdir()
+            }
+
+            val file = File(parent, "${type}_${simpleDateFormat.format(Date())}.jpg")
+
+            val fileOutputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+            fileOutputStream.flush()
+        }
+    }
     private fun loopSendHeart() {
         heartLoopDisposable?.dispose()
 

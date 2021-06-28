@@ -41,7 +41,8 @@ class MainActivity : AppCompatActivity() {
             when (intent.action) {
                 BluetoothDevice.ACTION_FOUND -> {
                     val device =
-                        intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)?: return
+                        intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                            ?: return
 
 
                     val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, 0)
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     if (!deviceName.startsWith("Hud_")) {
                         return
                     }
-                    if(device.type != BluetoothDevice.DEVICE_TYPE_CLASSIC){
+                    if (device.type != BluetoothDevice.DEVICE_TYPE_CLASSIC) {
                         return
                     }
 
@@ -86,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         RxPermissions(this)
-            .request(Manifest.permission.ACCESS_COARSE_LOCATION)
+            .request(Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION)
             .subscribe()
 
         val intentFilter = IntentFilter()
@@ -115,7 +116,9 @@ class MainActivity : AppCompatActivity() {
 
 
         search.setOnClickListener {
-            bluetoothAdapter.startDiscovery()
+            bluetoothAdapter.cancelDiscovery()
+            val result = bluetoothAdapter.startDiscovery()
+            Logger.d("startDiscovery result $result ${bluetoothAdapter.state}")
         }
 
 

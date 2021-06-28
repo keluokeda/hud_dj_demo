@@ -430,7 +430,7 @@ class HudService private constructor() {
         }
         val newBitmap = scaleBitmap(bitmap, 160)
         val compressedBitmap = compressBitmap(newBitmap, 8) ?: return false
-        messageHandler?.log("图片大小 ${compressedBitmap.byteCount}")
+        messageHandler?.log("压缩后的图片大小 ${compressedBitmap.byteCount} 图片宽度 = ${compressedBitmap.width} 图片高度${compressedBitmap.height}")
         return chatService.sender.sendImg(compressedBitmap)
     }
 
@@ -479,7 +479,7 @@ class HudService private constructor() {
     }
 
 
-    private fun scaleBitmap(bitmap: Bitmap, height: Int): Bitmap {
+     fun scaleBitmap(bitmap: Bitmap, height: Int): Bitmap {
 
 
         val scale = height * 1.0f / bitmap.height
@@ -489,7 +489,7 @@ class HudService private constructor() {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
     }
 
-    private fun compressBitmap(bitmap: Bitmap, sizeLimit: Long): Bitmap? {
+     fun compressBitmap(bitmap: Bitmap, sizeLimit: Long): Bitmap? {
         val baos = ByteArrayOutputStream()
         var quality = 100
         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
