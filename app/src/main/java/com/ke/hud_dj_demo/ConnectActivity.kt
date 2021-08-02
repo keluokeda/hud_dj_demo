@@ -10,14 +10,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import com.amap.api.navi.AmapNaviPage
 import com.amap.api.navi.AmapNaviParams
 import com.ke.addresspicker.RxAddressPicker
 import com.ke.hud_dj.HudService
-import com.ke.hud_dj.entity.CameraInfo
-import com.ke.hud_dj.entity.DeviceConnectState
-import com.ke.hud_dj.entity.NavigationInfo
-import com.ke.hud_dj.entity.NavigationTrafficStatus
+import com.ke.hud_dj.entity.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -91,7 +91,7 @@ class ConnectActivity : AppCompatActivity() {
 
         initListener()
 
-        loopSendHeart()
+//        loopSendHeart()
 
     }
 
@@ -206,7 +206,7 @@ class ConnectActivity : AppCompatActivity() {
             hudService.sendImage(
                 target
             )
-            saveBitmap(target,"_")
+            saveBitmap(target, "_")
 
         }
 
@@ -305,7 +305,72 @@ class ConnectActivity : AppCompatActivity() {
                 seek_bar.progress / 100f
             )
         }
+
+        get_engine_type.setOnClickListener {
+            hudService.getEngineType().subscribe({
+                AlertDialog.Builder(this)
+                    .setTitle(
+                        "name = ${it.typeName} type = ${it.type}"
+                    ).show()
+            }, {
+                it.printStackTrace()
+            })
+        }
+
+        val engineTypeList = EngineType.values()
+
+
+//        spinner.setOnItemClickListener { _, _, position, id ->
+//            val selectedType = engineTypeList[position]
+//            AlertDialog.Builder(this)
+//                .setTitle(
+//                    "name = ${selectedType.typeName} type = ${selectedType.type}"
+//                ).show()
+//        }
+
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val selectedType = engineTypeList[position]
+//                AlertDialog.Builder(this@ConnectActivity)
+//                    .setTitle(
+//                        "name = ${selectedType.typeName} type = ${selectedType.type}"
+//                    ).show()
+
+                val result = hudService.setEngineType(selectedType)
+
+                AlertDialog.Builder(this@ConnectActivity)
+                    .setTitle("设置引擎类型结果 $result $selectedType")
+                    .show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+        }
+        spinner.adapter =
+            ArrayAdapter<EngineType>(this, android.R.layout.simple_list_item_1, engineTypeList)
+
+
+        get_buzzer_switch.setOnClickListener {
+            hudService.getBuzzerSwitch().subscribe {
+                AlertDialog.Builder(this)
+                    .setTitle("蜂鸣器 $it")
+                    .show()
+            }
+        }
+
+        set_buzzer_switch.setOnClickListener {
+            hudService.setBuzzerSwitch(buzzer_switch.isChecked)
+        }
     }
+
     private fun saveBitmap(bitmap: Bitmap, type: String) {
         if (BuildConfig.DEBUG) {
 
@@ -325,6 +390,7 @@ class ConnectActivity : AppCompatActivity() {
             fileOutputStream.flush()
         }
     }
+
     private fun loopSendHeart() {
         heartLoopDisposable?.dispose()
 

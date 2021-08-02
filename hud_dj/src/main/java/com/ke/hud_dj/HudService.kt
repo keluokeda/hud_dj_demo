@@ -18,6 +18,7 @@ import com.example.bletohud.bleDevice.CamerasInfo
 import com.example.bletohud.bleDevice.NaviTrafficStatus
 
 import com.example.bletohud.bleDevice.Update
+import com.example.bletohud.bleDevice.bean.HudState
 import com.example.bletohud.bleDevice.listener.OnAbsConnectListener
 import com.example.bletohud.bleDevice.listener.OnAbsGetDataListener
 import com.example.bletohud.bleDevice.recevie.FirmwareInfo
@@ -479,7 +480,7 @@ class HudService private constructor() {
     }
 
 
-     fun scaleBitmap(bitmap: Bitmap, height: Int): Bitmap {
+    fun scaleBitmap(bitmap: Bitmap, height: Int): Bitmap {
 
 
         val scale = height * 1.0f / bitmap.height
@@ -489,7 +490,7 @@ class HudService private constructor() {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
     }
 
-     fun compressBitmap(bitmap: Bitmap, sizeLimit: Long): Bitmap? {
+    fun compressBitmap(bitmap: Bitmap, sizeLimit: Long): Bitmap? {
         val baos = ByteArrayOutputStream()
         var quality = 100
         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
@@ -560,6 +561,66 @@ class HudService private constructor() {
             cameraDistance = cameraInfo.distance
         }
 
+    /**
+     * 设置引擎类型
+     */
+    fun setEngineType(engineType: EngineType): Boolean {
+        return chatService.sender.setEngineType(engineType.type)
+    }
+
+    /**
+     * 获取引擎类型
+     */
+    fun getEngineType(): Observable<EngineType> {
+        return Observable.create { emitter ->
+            val result = chatService.geter.getEngineType(object : OnAbsGetDataListener() {
+                override fun onGetEngineTypeInfo(type: Int) {
+
+                    fromType(type)?.apply {
+                        emitter.onNext(this)
+                        emitter.onComplete()
+                    }
+                }
+
+                override fun dataError(str: String) {
+                    super.dataError(str)
+                    emitter.onError(RuntimeException(str))
+                }
+            })
+
+            if (!result) {
+                emitter.onError(java.lang.RuntimeException("获取失败"))
+            }
+        }
+    }
+
+    /**
+     * 获取蜂鸣器开关
+     */
+    fun getBuzzerSwitch(): Observable<Boolean> {
+        return Observable.create {
+            val result = chatService.geter.getBuzzerSwitch(object : OnAbsGetDataListener() {
+                override fun onGetBuzzerSwitch(on: Boolean) {
+                    if (it.isDisposed) {
+                        return
+                    }
+                    it.onNext(on)
+                    it.onComplete()
+                }
+            })
+            if (!result) {
+                it.onNext(false)
+                it.onComplete()
+            }
+        }
+    }
+
+    /**
+     * 设置蜂鸣器开关
+     */
+    fun setBuzzerSwitch(boolean: Boolean): Boolean {
+        return chatService.sender.setHudSwitch(HudState.HUD_BUZZER, boolean)
+    }
 
     companion object {
         val hudService = HudService()

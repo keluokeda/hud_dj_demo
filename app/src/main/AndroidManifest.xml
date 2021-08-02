@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.ke.hud_dj_demo">
+        package="com.ke.hud_dj_demo">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-/    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <application
             android:name=".App"
@@ -27,31 +27,30 @@
 
         <meta-data
                 android:name="com.amap.api.v2.apikey"
-                android:value="acfae1c4d0284a1d747b25e3dedd5c46"/>
+                android:value="acfae1c4d0284a1d747b25e3dedd5c46" />
 
 
-        <activity android:name=".ConnectActivity"
-                android:launchMode="singleInstance"
-                >
-        </activity>
+        <activity
+                android:name=".ConnectActivity"
+                android:launchMode="singleInstance"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity
                 android:name="com.amap.api.navi.AmapRouteActivity"
-                android:theme="@android:style/Theme.NoTitleBar"
-                android:configChanges="orientation|keyboardHidden|screenSize"/>
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:theme="@android:style/Theme.NoTitleBar" />
         <activity
                 android:name=".CustomNavigationActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
                 android:label="自定义Activity导航组件"
                 android:screenOrientation="portrait"
-                android:theme="@android:style/Theme.Light.NoTitleBar"/>
+                android:theme="@android:style/Theme.Light.NoTitleBar" />
 
         <activity
                 android:name=".CustomAmapRouteActivity"
