@@ -369,6 +369,22 @@ class ConnectActivity : AppCompatActivity() {
         set_buzzer_switch.setOnClickListener {
             hudService.setBuzzerSwitch(buzzer_switch.isChecked)
         }
+
+        get_buzzer_and_engine_type.setOnClickListener {
+            hudService.getBuzzerSwitch().subscribe({
+                loggerMessage("读取到蜂鸣器开关 $it")
+            }, {
+                it.printStackTrace()
+            })
+
+            hudService.getEngineType().subscribe({
+                loggerMessage("读取到引擎类型 $it")
+
+            }, {
+                it.printStackTrace()
+            }
+            )
+        }
     }
 
     private fun saveBitmap(bitmap: Bitmap, type: String) {

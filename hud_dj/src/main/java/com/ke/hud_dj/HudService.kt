@@ -100,12 +100,22 @@ class HudService private constructor() {
         override fun onReceive(context: Context, intent: Intent) {
 
 
-            messageHandler?.log("action = ${intent.action}")
+            messageHandler?.log("action = ${intent.action} extra = ${intent.extras}")
 
 
             val bluetoothDevice: BluetoothDevice? =
                 intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
 
+
+            if (intent.action == BluetoothAdapter.ACTION_STATE_CHANGED && intent.getIntExtra(
+                    BluetoothAdapter.EXTRA_STATE,
+                    -1
+                ) == BluetoothAdapter.STATE_OFF
+            ) {
+                messageHandler?.log("发现蓝牙断开")
+                connectStateSubject.onNext(DeviceConnectState.Disconnected)
+                return
+            }
 
 
             messageHandler?.log(
@@ -626,11 +636,11 @@ class HudService private constructor() {
         val hudService = HudService()
 
         val intentFilter = IntentFilter().apply {
-            addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
             addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED)
             addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+            addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         }
     }
 }

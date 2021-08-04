@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
                     val deviceName = device.name ?: ""
 
-                    Logger.d("发现设备 name = $deviceName rssi = $rssi")
+//                    Logger.d("发现设备 name = $deviceName rssi = $rssi")
 
                     if (!deviceName.startsWith("Hud_")) {
                         return
